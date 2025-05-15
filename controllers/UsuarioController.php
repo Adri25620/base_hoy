@@ -8,6 +8,13 @@ use MVC\Router;
 class UsuarioController extends ActiveRecord {
 
     public function paginausuario(Router $router){
-        $router->render('usuarios/usuario', []);
+        $router->render('usuarios/index', []);
+    }
+
+    public static function guardarAPI() {
+        getHeadersApi();
+
+        echo json_encode('llegue hasta guardar');
+        return;
     }
 }

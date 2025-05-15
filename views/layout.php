@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="build/js/app.js"></script>
+    <script src="<?= asset('build/js/app.js') ?>"></script>
     <link rel="shortcut icon" href="<?= asset('images/cit.png') ?>" type="image/x-icon">
     <link rel="stylesheet" href="<?= asset('build/styles.css') ?>">
     <title>DemoApp</title>
@@ -18,7 +18,7 @@
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/base_hoy/usuario">Usuario</a>
+          <a class="nav-link active" aria-current="page" href="/base_hoy/usuarios/index">Usuario</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#">Features</a>
@@ -46,6 +46,8 @@
     <div class="container-fluid pt-5 mb-4" style="min-height: 85vh">
         
         <?php echo $contenido; ?>
+
+
     </div>
     <div class="container-fluid " >
         <div class="row justify-content-center text-center">

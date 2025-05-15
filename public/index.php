@@ -14,7 +14,8 @@ $router->get('/', [AppController::class,'index']);
 
 
 //este es el url para usuario
-$router->get('/usuario', [UsuarioController::class, 'paginausuario']);
+$router->get('/usuarios/index', [UsuarioController::class, 'paginausuario']);
+$router->post('/usuarios/index/guardarAPI', [UsuarioController::class, 'guardarAPI']);
 
 
 // Comprueba y valida las rutas, que existan y les asigna las funciones del Controlador
