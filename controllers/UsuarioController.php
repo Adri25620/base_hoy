@@ -257,16 +257,6 @@ class UsuarioController extends ActiveRecord
 
             $id = filter_var($_GET['id'], FILTER_SANITIZE_NUMBER_INT);
 
-            // $data = Usuarios::find($id);
-            // // $data->sincronizar($_POST);
-            // $data->sincronizar([
-            //     'usuario_situacion' => 0,
-            // ]);
-            // $data->actualizar();
-
-            // $data = Usuarios::find($id);
-            // $data->eliminar();
-
 
             $ejecutar = Usuarios::EliminarUsuarios($id);
 
