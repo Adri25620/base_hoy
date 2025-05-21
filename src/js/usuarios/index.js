@@ -1,23 +1,27 @@
 import { Dropdown } from "bootstrap";
 import Swal from "sweetalert2";
-import { validarFormulario } from "../funciones";
-
-
+import { validarFormulario } from '../funciones';
+import DataTable from "datatables.net-bs5";
+import { lenguaje } from "../lenguaje";
+import { data } from "jquery";
 
 const FormUsuarios = document.getElementById('FormUsuarios');
 const BtnGuardar = document.getElementById('BtnGuardar');
 const BtnModificar = document.getElementById('BtnModificar');
-const InputUsTelefono = document.getElementById('us_telefono');
-const UsNit = document.getElementById('us_nit')
+const BtnLimpiar = document.getElementById('BtnLimpiar');
+const InputUsuarioTelefono = document.getElementById('us_telefono');
+const usuario_nit = document.getElementById('us_nit');
 
 
-//VALIDAR TELEFONO
 const ValidarTelefono = () => {
 
-    const CantidadDigitos = InputUsTelefono.value
+    const CantidadDigitos = InputUsuarioTelefono.value
+
 
     if (CantidadDigitos.length < 1) {
-        InputUsTelefono.classList.remove('is-valid', 'is-invalid');
+
+        InputUsuarioTelefono.classList.remove('is-valid', 'is-invalid');
+
     } else {
 
         if (CantidadDigitos.length != 8) {
@@ -25,30 +29,32 @@ const ValidarTelefono = () => {
                 position: "center",
                 icon: "error",
                 title: "Revise el numero de telefono",
-                text: "La cantidad de digitos debe ser menor a 8, ¡Por favor, corrija!",
+                text: "La cantidad de digitos debe ser mayor o igual 8  digitos",
                 showConfirmButton: true,
             });
-            InputUsTelefono.classList.remove('is-valid');
-            InputUsTelefono.classList.add('is-invalid');
+
+            InputUsuarioTelefono.classList.remove('is-valid');
+            InputUsuarioTelefono.classList.add('is-invalid');
 
         } else {
-            InputUsTelefono.classList.remove('is-invalid');
-            InputUsTelefono.classList.add('is-valid');
+            InputUsuarioTelefono.classList.remove('is-invalid');
+            InputUsuarioTelefono.classList.add('is-valid');
         }
+
     }
 }
 
 
-//VALIDAR NIT 
-function ValidarNit() {
-
-    const nit = UsNit.value.trim();
+function validarNit() {
+    const nit = usuario_nit.value.trim();
 
     let nd, add = 0;
-    if (nd = /^(\d+)\-?([\dkK])$/.exec(nit)) {
-        nd[2] = (nd[2].toLowerCase() === 'k') ? 10 : parseInt(nd[2]);
+
+    if (nd = /^(\d+)-?([\dkK])$/.exec(nit)) {
+        nd[2] = (nd[2].toLowerCase() === 'k') ? 10 : parseInt(nd[2], 10);
+
         for (let i = 0; i < nd[1].length; i++) {
-            add += ((((i - nd[1].length) * -1) + 1) * nd[1][i]);
+            add += ((((i - nd[1].length) * -1) + 1) * parseInt(nd[1][i], 10));
         }
         return ((11 - (add % 11)) % 11) === nd[2];
     } else {
@@ -56,57 +62,130 @@ function ValidarNit() {
     }
 }
 
-const esValidoNit = () =>{
-    ValidarNit();
+const EsValidoNit = () => {
 
-    if(ValidarNit()) {
-        UsNit.classList.add('is-valid');
-        UsNit.classList.remove('is-invalid');
+    validarNit();
+
+    if (validarNit()) {
+        usuario_nit.classList.add('is-valid');
+        usuario_nit.classList.remove('is-invalid');
     } else {
-        UsNit.classList.remove('is-valid');
-        UsNit.classList.add('is-invalid');
+        usuario_nit.classList.remove('is-valid');
+        usuario_nit.classList.add('is-invalid');
 
         Swal.fire({
-                position: "center",
-                icon: "error",
-                title: "NIT INVALIDO",
-                text: "El numero de nit es invalido, ¡Por favor, corrija!",
-                showConfirmButton: true,
+            position: "center",
+            icon: "error",
+            title: "NIT INVALIDO",
+            text: "El numero de nit ingresado es invalido",
+            showConfirmButton: true,
         });
+
+    }
 }
-}
 
 
+const GuardarUsuario = async (event) => {
 
-//GUARDAR
-const guardar = async (e) =>{
-
-    e.preventDefault();
+    event.preventDefault();
     BtnGuardar.disabled = true;
-    if(!validarFormulario(FormUsuarios, ['us_id'])){
+
+    if (!validarFormulario(FormUsuarios, ['us_id'])) {
         Swal.fire({
-                position: "center",
-                icon: "error",
-                title: "FORMULARIO COMPLETO",
-                text: "LLene todos los campos, ¡Por favor, corrija!",
-                showConfirmButton: true,
+            position: "center",
+            icon: "info",
+            title: "FORMULARIO INCOMPLETO",
+            text: "Debe de validar todos los campos",
+            showConfirmButton: true,
         });
         BtnGuardar.disabled = false;
     }
-    
-    const body = new FormData(FormUsuarios)
+
+    const body = new FormData(FormUsuarios);
 
     const url = '/base_hoy/usuarios/index/guardarAPI';
     const config = {
-        method : 'POST',
-        body 
+        method: 'POST',
+        body
     }
 
-    try{
+    try {
+
         const respuesta = await fetch(url, config);
         const datos = await respuesta.json();
 
-        console.log
+        const { codigo, mensaje } = datos
+
+        if (codigo == 1) {
+
+            await Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "Exito",
+                text: mensaje,
+                showConfirmButton: true,
+            });
+
+            limpiarTodo();
+            BuscarUsuarios();
+
+        } else {
+
+            await Swal.fire({
+                position: "center",
+                icon: "info",
+                title: "Error",
+                text: mensaje,
+                showConfirmButton: true,
+            });
+
+        }
+
+
+    } catch (error) {
+        console.log(error)
+    }
+    BtnGuardar.disabled = false;
+
+}
+
+const BuscarUsuarios = async () => {
+
+    const url = '/base_hoy/usuarios/index/buscarAPI';
+    const config = {
+        method: 'GET'
+    }
+
+    try {
+
+        const respuesta = await fetch(url, config);
+        const datos = await respuesta.json();
+        const { codigo, mensaje, data } = datos
+
+        if (codigo == 1) {
+
+            await Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "Exito",
+                text: mensaje,
+                showConfirmButton: true,
+            });
+
+            datatable.clear().draw();
+            datatable.rows.add(data).draw();
+
+        } else {
+
+            await Swal.fire({
+                position: "center",
+                icon: "info",
+                title: "Error",
+                text: mensaje,
+                showConfirmButton: true,
+            });
+        }
+
 
     } catch (error) {
         console.log(error)
@@ -114,7 +193,172 @@ const guardar = async (e) =>{
 }
 
 
+const datatable = new DataTable('#TableUsuarios', {
+    dom: `
+        <"row mt-3 justify-content-between" 
+            <"col" l> 
+            <"col" B> 
+            <"col-3" f>
+        >
+        t
+        <"row mt-3 justify-content-between" 
+            <"col-md-3 d-flex align-items-center" i> 
+            <"col-md-8 d-flex justify-content-end" p>
+        >
+    `,
+    language: lenguaje,
+    data: [],
+    columns: [
+        {
+            title: 'No.',
+            data: 'us_id',
+            width: '%',
+            render: (data, type, row, meta) => meta.row + 1
+        },
+        { title: 'Nombre', data: 'us_nombre' },
+        { title: 'Apellidos', data: 'us_apellidos' },
+        { title: 'Correo ', data: 'us_correo' },
+        { title: 'Telefono ', data: 'us_telefono' },
+        { title: 'Nit', data: 'us_nit' },
+        {
+            title: 'Destino',
+            data: 'us_estado',
+            render: (data, type, row) => {
 
-InputUsTelefono.addEventListener('change', ValidarTelefono);
-UsNit.addEventListener('change', esValidoNit);
-FormUsuarios.addEventListener('submit', guardar)
+                const estado = row.us_estado
+
+                if (estado == "P") {
+                    return "PRESENTE"
+                } else if (estado == "F") {
+                    return "FALTANDO"
+                } else if (estado == "C") {
+                    return "COMISION"
+                }
+            }
+        },
+        {
+            title: 'Acciones',
+            data: 'us_id',
+            searchable: false,
+            orderable: false,
+            render: (data, type, row, meta) => {
+                return `
+                 <div class='d-flex justify-content-center'>
+                     <button class='btn btn-warning modificar mx-1' 
+                         data-id="${data}" 
+                         data-nombre="${row.us_nombre}"  
+                         data-apellidos="${row.us_apellidos}"  
+                         data-nit="${row.us_nit}"  
+                         data-telefono="${row.us_telefono}"  
+                         data-correo="${row.us_correo}"  
+                         data-estado="${row.us_estado}"  
+                         <i class='bi bi-pencil-square me-1'></i> Modificar
+                     </button>
+                     <button class='btn btn-danger eliminar mx-1' 
+                         data-id="${data}">
+                        <i class="bi bi-trash3 me-1"></i>Eliminar
+                     </button>
+                 </div>`;
+            }
+        }
+    ]
+});
+
+
+const llenarFormulario = (event) => {
+
+    const datos = event.currentTarget.dataset
+
+    document.getElementById('us_id').value = datos.id
+    document.getElementById('us_nombre').value = datos.nombre
+    document.getElementById('us_apellidos').value = datos.apellidos
+    document.getElementById('us_nit').value = datos.nit
+    document.getElementById('us_telefono').value = datos.telefono
+    document.getElementById('us_correo').value = datos.correo
+    document.getElementById('us_estado').value = datos.estado
+
+    BtnGuardar.classList.add('d-none');
+    BtnModificar.classList.remove('d-none');
+
+}
+
+const limpiarTodo = () => {
+
+    FormUsuarios.reset();
+    BtnGuardar.classList.remove('d-none');
+    BtnModificar.classList.add('d-none');
+}
+
+
+
+const ModificarUsuario = async (event) => {
+
+    event.preventDefault();
+    BtnModificar.disabled = true;
+
+    if (!validarFormulario(FormUsuarios, [''])) {
+        Swal.fire({
+            position: "center",
+            icon: "info",
+            title: "FORMULARIO INCOMPLETO",
+            text: "Debe de validar todos los campos",
+            showConfirmButton: true,
+        });
+        BtnGuardar.disabled = false;
+    }
+
+    const body = new FormData(FormUsuarios);
+
+    const url = '/base_hoy/usuarios/index/modificarAPI';
+    const config = {
+        method: 'POST',
+        body
+    }
+
+    try {
+
+        const respuesta = await fetch(url, config);
+        const datos = await respuesta.json();
+        const { codigo, mensaje } = datos
+
+        if (codigo == 1) {
+
+            await Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "Exito",
+                text: mensaje,
+                showConfirmButton: true,
+            });
+
+            limpiarTodo();
+            BuscarUsuarios();
+
+        } else {
+
+            await Swal.fire({
+                position: "center",
+                icon: "info",
+                title: "Error",
+                text: mensaje,
+                showConfirmButton: true,
+            });
+
+        }
+
+
+    } catch (error) {
+        console.log(error)
+    }
+    BtnModificar.disabled = false;
+
+}
+
+
+BuscarUsuarios();
+datatable.on('click', '.modificar', llenarFormulario);
+FormUsuarios.addEventListener('submit', GuardarUsuario);
+usuario_nit.addEventListener('change', EsValidoNit);
+InputUsuarioTelefono.addEventListener('change', ValidarTelefono);
+BtnLimpiar.addEventListener('click', limpiarTodo);
+BtnModificar.addEventListener('click', ModificarUsuario);

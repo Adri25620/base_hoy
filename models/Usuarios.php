@@ -3,8 +3,8 @@ namespace Model;
 
 class Usuarios extends ActiveRecord{
 
-    public $tabla = 'usuarios';
-    public $columnasDB = [
+    public static $tabla = 'usuarios';
+    public static $columnasDB = [
         'us_nombre',
         'us_apellidos',
         'us_nit',
@@ -13,7 +13,7 @@ class Usuarios extends ActiveRecord{
         'us_estado',
         'us_situacion'
     ];
-    public $idTabla = 'us_id';
+    public static $idTabla = 'us_id';
 
     public $us_id;
     public $us_nombre;
@@ -29,10 +29,10 @@ class Usuarios extends ActiveRecord{
         $this->us_id = $args['us_id'] ?? null;
         $this->us_nombre = $args['us_nombre'] ?? '';
         $this->us_apellidos = $args['us_apellidos'] ?? '';
-        $this->us_nit = $args['us_nit'] ?? '';
-        $this->us_telefono = $args['us_telefono'] ?? '';
-        $this->us_correo = $args['us_correo'] ?? '';
-        $this->us_estado = $args['us_estado'] ?? '';
+        $this->us_nit = $args['us_nit'] ?? 0;
+        $this->us_telefono = $args['us_telefono'] ?? 0;
+        $this->us_correo = $args['us_correo'] ?? 0;
+        $this->us_estado = $args['us_estado'] ?? 0;
         $this->us_situacion = $args['us_situacion'] ?? 1;
         
     }
