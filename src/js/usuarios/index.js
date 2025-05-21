@@ -280,7 +280,11 @@ const llenarFormulario = (event) => {
     BtnGuardar.classList.add('d-none');
     BtnModificar.classList.remove('d-none');
 
+    window.scrollTo({
+    top: 0
+});
 }
+
 
 const limpiarTodo = () => {
 
@@ -354,8 +358,65 @@ const ModificarUsuario = async (event) => {
 
 }
 
+const EliminarUsuarios = async (e) => {
+
+    const idUsuario = e.currentTarget.dataset.id
+
+    const AlertaConfirmarEliminar = await Swal.fire({
+        position: "center",
+        icon: "info",
+        title: "¿Desea ejecutar esta acción?",
+        text: 'Esta completamente seguro que desea eliminar este registro',
+        showConfirmButton: true,
+        confirmButtonText: 'Si, Eliminar',
+        confirmButtonColor: 'red',
+        cancelButtonText: 'No, Cancelar',
+        showCancelButton: true
+    });
+
+    if (AlertaConfirmarEliminar.isConfirmed) {
+
+        const url = `/base_hoy/usuarios/index/eliminar?id=${idUsuario}`;
+        const config = {
+            method: 'GET'
+        }
+
+        try {
+
+            const consulta = await fetch(url, config);
+            const respuesta = await consulta.json();
+            const { codigo, mensaje } = respuesta;
+
+            if (codigo == 1) {
+
+                await Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "Exito",
+                    text: mensaje,
+                    showConfirmButton: true,
+                });
+                
+                BuscarUsuarios();
+            } else {
+                await Swal.fire({
+                    position: "center",
+                    icon: "error",
+                    title: "Error",
+                    text: mensaje,
+                    showConfirmButton: true,
+                });
+            }
+
+        } catch (error) {
+            console.log(error)
+        }
+
+    }
+}
 
 BuscarUsuarios();
+datatable.on('click', '.eliminar', EliminarUsuarios);
 datatable.on('click', '.modificar', llenarFormulario);
 FormUsuarios.addEventListener('submit', GuardarUsuario);
 usuario_nit.addEventListener('change', EsValidoNit);

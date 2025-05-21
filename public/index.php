@@ -16,6 +16,7 @@ $router->get('/usuarios/index', [UsuarioController::class, 'paginausuario']);
 $router->post('/usuarios/index/guardarAPI', [UsuarioController::class, 'guardarAPI']);
 $router->get('/usuarios/index/buscarAPI', [UsuarioController::class, 'buscarAPI']);
 $router->post('/usuarios/index/modificarAPI', [UsuarioController::class, 'modificarAPI']);
+$router->get('/usuarios/index/eliminar', [UsuarioController::class, 'EliminarAPI']);
 
 
 // Comprueba y valida las rutas, que existan y les asigna las funciones del Controlador

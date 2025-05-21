@@ -249,4 +249,40 @@ class UsuarioController extends ActiveRecord
             return;
         }
     }
+
+     public static function EliminarAPI()
+    {
+
+        try {
+
+            $id = filter_var($_GET['id'], FILTER_SANITIZE_NUMBER_INT);
+
+            // $data = Usuarios::find($id);
+            // // $data->sincronizar($_POST);
+            // $data->sincronizar([
+            //     'usuario_situacion' => 0,
+            // ]);
+            // $data->actualizar();
+
+            // $data = Usuarios::find($id);
+            // $data->eliminar();
+
+
+            $ejecutar = Usuarios::EliminarUsuarios($id);
+
+
+            http_response_code(200);
+            echo json_encode([
+                'codigo' => 1,
+                'mensaje' => 'El registro ha sido eliminado correctamente'
+            ]);
+        } catch (Exception $e) {
+            http_response_code(400);
+            echo json_encode([
+                'codigo' => 0,
+                'mensaje' => 'Error al Eliminar',
+                'detalle' => $e->getMessage(),
+            ]);
+        }
+    }
 }
