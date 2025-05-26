@@ -45,6 +45,12 @@
                                 <option value="C">COMISION</option>
                             </select>
                         </div>
+                        <div class="row mb-3 ">
+                            <div class="col-lg-6">
+                                <label for="us_fecha" class="form-label">INGRESE LA FECHA</label>
+                                <input type="datetime-local" class="form-control" id="us_fecha" name="us_fecha" placeholder="Ingrese aca su correo ejemplo@ejemplo.com">
+                            </div>
+                        </div>
                         <div class="row justify-content-center mt-5">
                             <div class="col-auto">
                                 <button class="btn btn-success" type="submit" id="BtnGuardar">
@@ -76,6 +82,22 @@
             <div class="card-body p-3">
                 <h3 class="text-center">USUARIOS REGISTRADOS EN LA BASE DE DATOS</h3>
 
+                <!-- FILTRO DE FECHAS -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="fecha_inicio" class="form-label">Fecha de inicio:</label>
+                        <input type="date" id="fecha_inicio" class="form-control">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="fecha_fin" class="form-label">Fecha de fin:</label>
+                        <input type="date" id="fecha_fin" class="form-control">
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button class="btn btn-primary w-100" id="btn_filtrar_fecha">Filtrar</button>
+                    </div>
+                </div>
+                <!-- FIN FILTRO DE FECHAS -->
+
                 <div class="table-responsive p-2">
                     <table class="table table-striped table-hover table-bordered w-100 table-sm" id="TableUsuarios">
                     </table>
@@ -85,5 +107,6 @@
         </div>
     </div>
 </div>
+
 
 <script src="<?= asset('build/js/usuarios/index.js') ?>"></script>

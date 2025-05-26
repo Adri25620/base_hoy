@@ -11,6 +11,9 @@ const BtnModificar = document.getElementById('BtnModificar');
 const BtnLimpiar = document.getElementById('BtnLimpiar');
 const InputUsuarioTelefono = document.getElementById('us_telefono');
 const usuario_nit = document.getElementById('us_nit');
+const FechaInicio = document.getElementById('fecha_inicio');
+const FechaFin = document.getElementById('fecha_fin');
+const BtnFiltrarFecha = document.getElementById('btn_filtrar_fecha');
 
 
 const ValidarTelefono = () => {
@@ -151,7 +154,15 @@ const GuardarUsuario = async (event) => {
 
 const BuscarUsuarios = async () => {
 
-    const url = '/base_hoy/usuarios/index/buscarAPI';
+    const fecha_inicio = FechaInicio?.value || '';
+    const fecha_fin = FechaFin?.value || '';
+
+    const params = new URLSearchParams();
+
+    if (fecha_inicio) params.append('fecha_inicio', fecha_inicio);
+    if (fecha_fin) params.append('fecha_fin', fecha_fin);
+
+    const url = `/base_hoy/usuarios/index/buscarAPI?${params.toString()}`;
     const config = {
         method: 'GET'
     }
@@ -236,6 +247,7 @@ const datatable = new DataTable('#TableUsuarios', {
                 }
             }
         },
+        { title: 'Fecha', data: 'us_fecha' },
         {
             title: 'Acciones',
             data: 'us_id',
@@ -251,7 +263,8 @@ const datatable = new DataTable('#TableUsuarios', {
                          data-nit="${row.us_nit}"  
                          data-telefono="${row.us_telefono}"  
                          data-correo="${row.us_correo}"  
-                         data-estado="${row.us_estado}"  
+                         data-estado="${row.us_estado}"
+                         data-fecha="${row.us_fecha}"   
                          <i class='bi bi-pencil-square me-1'></i> Modificar
                      </button>
                      <button class='btn btn-danger eliminar mx-1' 
@@ -276,6 +289,7 @@ const llenarFormulario = (event) => {
     document.getElementById('us_telefono').value = datos.telefono
     document.getElementById('us_correo').value = datos.correo
     document.getElementById('us_estado').value = datos.estado
+    document.getElementById('us_fecha').value = datos.fecha
 
     BtnGuardar.classList.add('d-none');
     BtnModificar.classList.remove('d-none');
@@ -423,3 +437,4 @@ usuario_nit.addEventListener('change', EsValidoNit);
 InputUsuarioTelefono.addEventListener('change', ValidarTelefono);
 BtnLimpiar.addEventListener('click', limpiarTodo);
 BtnModificar.addEventListener('click', ModificarUsuario);
+BtnFiltrarFecha.addEventListener('click', BuscarUsuarios);

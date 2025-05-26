@@ -11,6 +11,7 @@ class Usuarios extends ActiveRecord{
         'us_telefono',
         'us_correo',
         'us_estado',
+        'us_fecha',
         'us_situacion'
     ];
     public static $idTabla = 'us_id';
@@ -22,6 +23,7 @@ class Usuarios extends ActiveRecord{
     public $us_telefono;
     public $us_correo;
     public $us_estado;
+    public $us_fecha;
     public $us_situacion;
 
 
@@ -33,6 +35,7 @@ class Usuarios extends ActiveRecord{
         $this->us_telefono = $args['us_telefono'] ?? 0;
         $this->us_correo = $args['us_correo'] ?? 0;
         $this->us_estado = $args['us_estado'] ?? 0;
+        $this->us_fecha = $args['us_fecha'] ?? '';
         $this->us_situacion = $args['us_situacion'] ?? 1;
         
     }

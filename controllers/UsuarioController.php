@@ -63,6 +63,7 @@ class UsuarioController extends ActiveRecord
 
         $_POST['us_nit'] = filter_var($_POST['us_nit'], FILTER_SANITIZE_NUMBER_INT);
         $_POST['us_correo'] = filter_var($_POST['us_correo'], FILTER_SANITIZE_EMAIL);
+        $_POST['us_fecha'] = date('Y-m-d H:i', strtotime($_POST['us_fecha']));
 
         if (!filter_var($_POST['us_correo'], FILTER_SANITIZE_EMAIL)) {
             http_response_code(400);
@@ -91,6 +92,7 @@ class UsuarioController extends ActiveRecord
                     'us_telefono' => $_POST['us_telefono'],
                     'us_correo' => $_POST['us_correo'],
                     'us_estado' => $_POST['us_estado'],
+                    'us_fecha' => $_POST['us_fecha'],
                     'us_situacion' => 1
                 ]);
 
@@ -121,30 +123,47 @@ class UsuarioController extends ActiveRecord
     }
 
     public static function buscarAPI()
-    {
+{
+    try {
+        // Capturar fechas desde los parámetros GET
+        $fecha_inicio = isset($_GET['fecha_inicio']) ? $_GET['fecha_inicio'] : null;
+        $fecha_fin = isset($_GET['fecha_fin']) ? $_GET['fecha_fin'] : null;
 
-        try {
+        // Condición base
+        $condiciones = ["us_situacion = 1"];
 
-            // $data = Usuarios::all();
-
-            $sql = "SELECT * FROM usuarios where us_situacion = 1";
-            $data = self::fetchArray($sql);
-
-            http_response_code(200);
-            echo json_encode([
-                'codigo' => 1,
-                'mensaje' => 'Usuarios obtenidos correctamente',
-                'data' => $data
-            ]);
-        } catch (Exception $e) {
-            http_response_code(400);
-            echo json_encode([
-                'codigo' => 0,
-                'mensaje' => 'Error al obtener los usuarios',
-                'detalle' => $e->getMessage(),
-            ]);
+        // Agregar condiciones si las fechas están definidas
+        if ($fecha_inicio) {
+            $condiciones[] = "us_fecha >= '{$fecha_inicio} 00:00'";
         }
+
+        if ($fecha_fin) {
+            $condiciones[] = "us_fecha <= '{$fecha_fin} 23:59'";
+        }
+
+        // Combinar todas las condiciones en un WHERE
+        $where = implode(" AND ", $condiciones);
+
+        // Consulta final
+        $sql = "SELECT * FROM usuarios WHERE $where";
+        $data = self::fetchArray($sql);
+
+        http_response_code(200);
+        echo json_encode([
+            'codigo' => 1,
+            'mensaje' => 'Usuarios obtenidos correctamente',
+            'data' => $data
+        ]);
+    } catch (Exception $e) {
+        http_response_code(400);
+        echo json_encode([
+            'codigo' => 0,
+            'mensaje' => 'Error al obtener los usuarios',
+            'detalle' => $e->getMessage(),
+        ]);
     }
+}
+
 
 
     public static function modificarAPI()
@@ -195,6 +214,7 @@ class UsuarioController extends ActiveRecord
 
         $_POST['us_nit'] = filter_var($_POST['us_nit'], FILTER_SANITIZE_NUMBER_INT);
         $_POST['us_correo'] = filter_var($_POST['us_correo'], FILTER_SANITIZE_EMAIL);
+        $_POST['us_fecha'] = date('Y-m-d H:i', strtotime($_POST['us_fecha']));
 
         if (!filter_var($_POST['us_correo'], FILTER_SANITIZE_EMAIL)) {
             http_response_code(400);
@@ -222,7 +242,8 @@ class UsuarioController extends ActiveRecord
                     'us_nit' => $_POST['us_nit'],
                     'us_telefono' => $_POST['us_telefono'],
                     'us_correo' => $_POST['us_correo'],
-                    'us_estado' => $_POST['us_estado'],
+                    'us_estado' => $_POST['us_estado'],  
+                    'us_fecha' => $_POST['us_fecha'],
                     'us_situacion' => 1
                 ]);
                 $data->actualizar();
